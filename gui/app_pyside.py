@@ -2933,6 +2933,7 @@ class SanityCheckApp(QMainWindow):
         help_menu.addSeparator()
         
         about_action = QAction("&About TicketAudit", self)
+        about_action.setMenuRole(QAction.MenuRole.NoRole)
         about_action.triggered.connect(self.show_about_dialog)
         help_menu.addAction(about_action)
 
