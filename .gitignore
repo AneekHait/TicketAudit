@@ -1,0 +1,36 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Virtual environment
+.venv/
+venv/
+
+# User settings: written next to config.py at runtime and holds machine-local
+# state (last folder, window geometry), so it is per-install, not source.
+config.json
+
+# Generated reports
+exports/
+sanity_report*.xlsx
+
+# Pytest basetemp
+%TEMP%ticketaudit-pytest/
+ticketaudit-pytest/
+
+# AI assistant instructions (internal dev tooling, not for public consumption)
+CLAUDE.md
+
+# Design working files
+mockups/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.code-workspace

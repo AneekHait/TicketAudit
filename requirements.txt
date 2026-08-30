@@ -1,0 +1,28 @@
+# TicketAudit - Dependencies
+# Install with: pip install -r requirements.txt
+
+# GUI Framework
+PySide6>=6.6.0,<7
+
+# Data Processing
+# pandas 3 is what the suite runs against: it splits the 'str' dtype out of
+# 'object', which core/analyzer.py and loader.optimize_dtypes both account for.
+# The old <3 cap meant a fresh install got pandas 2 while development ran on 3.
+pandas>=2.2,<4
+numpy>=1.24.0,<3
+openpyxl>=3.1.0          # .xlsx read/write
+xlrd>=2.0,<3             # legacy .xls read (xlrd 2.x is .xls-only)
+# Optional read accelerator: ~6x faster .xlsx loads (21s -> 3.3s on 100k rows).
+# core/loader.py falls back to openpyxl if it is absent, so this is a speed
+# dependency, not a functional one.
+python-calamine>=0.2.0
+
+# Language Detection
+lingua-language-detector>=2.0.0
+
+# Clipboard
+pyperclip>=1.8.0
+
+# Testing (optional — only needed to run the test suite)
+# pytest>=7.0
+# pytest-mock>=3.0

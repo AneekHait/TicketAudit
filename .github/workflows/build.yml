@@ -1,0 +1,228 @@
+name: Build Distribution Packages (.exe, .dmg, .deb, .rpm)
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # WINDOWS BUILD (.exe / .zip)
+  # ---------------------------------------------------------------------------
+  build-windows:
+    name: Build Windows (.exe)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install "pyinstaller>=6,<7"
+
+      - name: Build Executable with PyInstaller
+        run: |
+          pyinstaller --noconfirm TicketAudit.spec
+
+      - name: Package Windows Bundle (ZIP)
+        shell: powershell
+        run: |
+          Compress-Archive -Path dist/TicketAudit/* -DestinationPath dist/TicketAudit-Windows-x64.zip
+
+      - name: Build Standalone Single File (.exe)
+        run: |
+          pyinstaller --noconfirm --onefile --windowed --name="TicketAudit-Standalone" --icon="gui/assets/ticketaudit.ico" --add-data "gui/assets;gui/assets" --add-data "core/assets;core/assets" --add-data "gui/app_pyside.py;gui" --add-data "banner.txt;." main.py
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: TicketAudit-Windows-x64
+          path: |
+            dist/TicketAudit-Windows-x64.zip
+            dist/TicketAudit-Standalone.exe
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # MACOS BUILD (.dmg)
+  # ---------------------------------------------------------------------------
+  build-macos:
+    name: Build macOS (.dmg)
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # pillow is required here, not optional: on macOS PyInstaller only
+          # accepts .icns and will refuse a .ico outright unless Pillow is
+          # present to convert it.
+          pip install "pyinstaller>=6,<7" pillow
+
+      - name: Build macOS App Bundle
+        run: |
+          pyinstaller --noconfirm --onedir --windowed --name="TicketAudit" --icon="gui/assets/ticketaudit.ico" --add-data "gui/assets:gui/assets" --add-data "core/assets:core/assets" --add-data "gui/app_pyside.py:gui" --add-data "banner.txt:." main.py
+
+      - name: Create macOS DMG Disk Image
+        run: |
+          mkdir -p dist/dmg_root
+          cp -R dist/TicketAudit.app dist/dmg_root/ 2>/dev/null || cp -R dist/TicketAudit dist/dmg_root/
+          hdiutil create -volname "TicketAudit" -srcfolder dist/dmg_root -ov -format UDZO dist/TicketAudit-macOS.dmg
+
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TicketAudit-macOS
+          path: dist/TicketAudit-macOS.dmg
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # LINUX BUILD (.deb & .rpm)
+  # ---------------------------------------------------------------------------
+  build-linux:
+    name: Build Linux (.deb & .rpm)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up System & Packaging Dependencies
+        run: |
+          sudo apt-get update
+          # ubuntu-latest is 24.04 (noble): libgl1-mesa-glx was dropped after
+          # 22.04 and 'rubygems' no longer exists as a package -- gem ships
+          # with 'ruby'. Using either name fails the whole job at this step.
+          sudo apt-get install -y ruby ruby-dev build-essential rpm libgl1 libegl1 libxkbcommon-x11-0
+          sudo gem install --no-document fpm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install "pyinstaller>=6,<7"
+
+      - name: Build Linux Binary with PyInstaller
+        run: |
+          pyinstaller --noconfirm --onedir --windowed --name="TicketAudit" --add-data "gui/assets:gui/assets" --add-data "core/assets:core/assets" --add-data "gui/app_pyside.py:gui" --add-data "banner.txt:." main.py
+
+      - name: Prepare Package Tree
+        run: |
+          mkdir -p pkg/usr/bin pkg/usr/lib/ticketaudit pkg/usr/share/applications pkg/usr/share/pixmaps
+          cp -r dist/TicketAudit/* pkg/usr/lib/ticketaudit/
+          ln -sf /usr/lib/ticketaudit/TicketAudit pkg/usr/bin/ticketaudit
+          cp gui/assets/logo.png pkg/usr/share/pixmaps/ticketaudit.png
+
+          cat << 'EOF' > pkg/usr/share/applications/ticketaudit.desktop
+          [Desktop Entry]
+          Name=TicketAudit
+          Comment=ITSM Ticket Data Analysis and Validation Tool
+          Exec=/usr/bin/ticketaudit
+          Icon=ticketaudit
+          Terminal=false
+          Type=Application
+          Categories=Utility;Analysis;
+          EOF
+
+      - name: Build .deb Package
+        run: |
+          fpm -s dir -t deb \
+            -n ticketaudit \
+            -v 1.0.0 \
+            --architecture amd64 \
+            -C pkg \
+            --prefix / \
+            -d "libgl1" -d "libegl1" -d "libxkbcommon0" \
+            -m "AneekHait" \
+            --description "TicketAudit ITSM Ticket Data Analysis and Audit Application" \
+            -p dist/ticketaudit_1.0.0_amd64.deb
+
+      - name: Build .rpm Package
+        run: |
+          fpm -s dir -t rpm \
+            -n ticketaudit \
+            -v 1.0.0 \
+            --architecture x86_64 \
+            -C pkg \
+            --prefix / \
+            -m "AneekHait" \
+            --description "TicketAudit ITSM Ticket Data Analysis and Audit Application" \
+            -p dist/ticketaudit-1.0.0-1.x86_64.rpm
+
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: TicketAudit-Linux
+          path: |
+            dist/ticketaudit_1.0.0_amd64.deb
+            dist/ticketaudit-1.0.0-1.x86_64.rpm
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # RELEASE JOB (Create Release on Tag Push)
+  # ---------------------------------------------------------------------------
+  create-release:
+    name: Publish GitHub Release
+    needs: [build-windows, build-macos, build-linux]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Windows Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: TicketAudit-Windows-x64
+          path: release_assets/
+
+      - name: Download macOS Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: TicketAudit-macOS
+          path: release_assets/
+
+      - name: Download Linux Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: TicketAudit-Linux
+          path: release_assets/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release_assets/*
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
