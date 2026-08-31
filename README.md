@@ -23,6 +23,26 @@
 
 ---
 
+## Download
+
+<p align="center">
+  <a href="https://github.com/AneekHait/TicketAudit/releases/latest"><img src="https://img.shields.io/github/v/release/AneekHait/TicketAudit?label=Latest%20Release&color=brightgreen" alt="Latest Release"/></a>
+</p>
+
+| Platform | File | Notes |
+|---|---|---|
+| **Windows** | `TicketAudit-Standalone.exe` | Single-file, no install needed |
+| **Windows** | `TicketAudit-Windows-x64.zip` | Full bundle with all dependencies |
+| **macOS** | `TicketAudit-macOS.dmg` | Disk image, drag to Applications |
+| **Linux (Debian/Ubuntu)** | `ticketaudit_x.x.x_amd64.deb` | Install with `sudo dpkg -i` |
+| **Linux (Fedora/RHEL)** | `ticketaudit-x.x.x-1.x86_64.rpm` | Install with `sudo rpm -i` |
+
+**[Download the latest release](https://github.com/AneekHait/TicketAudit/releases/latest)**
+
+Or run from source on any platform — see [Installation](#installation) below.
+
+---
+
 ## The Problem
 
 ServiceNow exports land as Excel files with 100,000–300,000 rows and 25+ columns. Excel opens them — slowly — but can't filter, pivot, or chart them without hanging. So teams either work from samples, or they push the full file into a pivot table and trust that the underlying data is clean.
