@@ -10,7 +10,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10+-blue.svg" alt="Python"/>
   <img src="https://img.shields.io/badge/GUI-PySide6-green.svg" alt="PySide6"/>
-  <img src="https://img.shields.io/badge/Platform-Windows-lightgrey.svg" alt="Windows"/>
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg" alt="Windows | macOS | Linux"/>
   <img src="https://img.shields.io/badge/Edition-Community-brightgreen.svg" alt="Community Edition"/>
 </p>
 
@@ -64,6 +64,40 @@ If you tried to cover the same ground in Excel, this is what it takes — on a f
 That's a half-day of formula work on a good day, on a file that may freeze Excel halfway through. And it still misses anything requiring cross-column logic, language awareness, or fuzzy matching.
 
 TicketAudit runs all of it in under 4 seconds on a 100k-row file. Checks that cannot run say so explicitly — they never silently count as a pass.
+
+---
+
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/overview.png" alt="Overview — findings register" width="800"/>
+  <br/><em>Overview — every check as one row, worst first</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/column-check.png" alt="Column Check — field mapping" width="800"/>
+  <br/><em>Column Check — match required fields with confidence scores</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/logic-checks.png" alt="Logic Checks — cross-field validation" width="800"/>
+  <br/><em>Logic Checks — contradictions between fields, with per-row evidence</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/language-check.png" alt="Language Check — non-English detection" width="800"/>
+  <br/><em>Language Check — detect non-English text across 33 languages</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/monthly-inflow.png" alt="Monthly Inflow — trend chart" width="800"/>
+  <br/><em>Monthly Inflow — volume trend with part-month warnings</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/extract.png" alt="Extract — filter and export" width="800"/>
+  <br/><em>Extract — slice by date range and columns, write a file Excel can open</em>
+</p>
 
 ---
 
@@ -290,12 +324,20 @@ Plus two hidden helper sheets (`ChartData`, `PivotData`) — named on Overview, 
 
 Double-click **`TicketAudit.bat`**. On first run it creates a virtual environment and installs dependencies, then launches the app.
 
+### macOS / Linux — quick start
+
+```bash
+./TicketAudit.sh
+```
+
+On first run it creates a virtual environment, installs dependencies, and launches the app. Requires Python 3.10+.
+
 ### Manual setup
 
 ```bash
-python -m venv .venv
-.venv\Scripts\activate        # Windows
-# source .venv/bin/activate   # macOS / Linux
+python3 -m venv .venv
+source .venv/bin/activate     # macOS / Linux
+# .venv\Scripts\activate      # Windows
 pip install -r requirements.txt
 python main.py
 ```

@@ -2945,7 +2945,7 @@ class SanityCheckApp(QMainWindow):
         # Encoded author info (base64) - harder to find/modify via text search
         _a = base64.b64decode(b'QW5lZWsgSGFpdA==').decode()  # Author
         _n = base64.b64decode(b'VGlja2V0QXVkaXQ=').decode()  # App name
-        _v = base64.b64decode(b'Mi4yLjA=').decode()  # Version
+        _v = base64.b64decode(b'Mi4yLjE=').decode()  # Version
         _y = base64.b64decode(b'MjAyNS0yMDI2').decode()  # Year
         # Public links for the community edition.
         _site = "https://aneekhait.github.io"
@@ -2957,7 +2957,7 @@ class SanityCheckApp(QMainWindow):
 
         # Integrity check - if someone modifies the values, hash won't match
         _check = hashlib.sha256(f"{_a}{_n}{_v}".encode()).hexdigest()[:8]
-        _expected = "xx2b58c176"[2:10]  # Obfuscated expected hash
+        _expected = "xx3554d44c"[2:10]  # Obfuscated expected hash
         
         if _check != _expected:
             QMessageBox.critical(self, "Integrity Error", 
@@ -3034,6 +3034,7 @@ machine.</p>
 
 <p style="font-size: $FONT_XS; margin: 5px 0;"><b>Version History</b></p>
 <table style="font-size: $FONT_XS; width: 100%;">
+<tr style="background: $COLOR_SURFACE_RAISED;"><td style="padding: 4px;"><b>v2.2.1</b> (Aug 2026)</td><td style="padding: 4px;">Cross-platform support (macOS, Linux), shell launcher, screenshots in README</td></tr>
 <tr style="background: $COLOR_SURFACE_RAISED;"><td style="padding: 4px;"><b>v2.2.0</b> (Aug 2026)</td><td style="padding: 4px;">Hybrid shell with sidebar navigation, the Overview register, Logic Checks as a finding-first workbench, guided review, and a three-face type system</td></tr>
 <tr style="background: $COLOR_SURFACE_RAISED;"><td style="padding: 4px;"><b>v2.1.0</b> (Aug 2026)</td><td style="padding: 4px;">Extract view, six-tab Excel report with native pivots, correctable column mapping and date order, cross-field logic checks</td></tr>
 <tr style="background: $COLOR_SURFACE_RAISED;"><td style="padding: 4px;"><b>v2.0.0</b> (Jan 2026)</td><td style="padding: 4px;">PySide6 GUI, new branding, Help system, QtCharts, performance optimizations</td></tr>

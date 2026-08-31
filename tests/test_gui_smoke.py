@@ -3063,7 +3063,7 @@ class TestVersionIntegrity:
         monkeypatch.setattr(ui.QMessageBox, "critical",
                             staticmethod(lambda *a, **k: None))
         window.show_about_dialog()
-        assert "2.2.0" in captured.get("text", "")
+        assert "2.2.1" in captured.get("text", "")
 
 
 class TestExtractExcludeCancelled:

@@ -13,7 +13,7 @@
  ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝   ╚═╝
 
      Know your queue before you report it
-     v2.2.0  //  LOCAL  //  OFFLINE  //  COMMUNITY EDITION
+     v2.2.1  //  LOCAL  //  OFFLINE  //  COMMUNITY EDITION
 
      Created by Aneek Hait
      aneekhait.github.io   |   github.com/AneekHait

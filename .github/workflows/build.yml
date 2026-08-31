@@ -159,34 +159,34 @@ jobs:
         run: |
           fpm -s dir -t deb \
             -n ticketaudit \
-            -v 1.0.0 \
+            -v 2.2.1 \
             --architecture amd64 \
             -C pkg \
             --prefix / \
             -d "libgl1" -d "libegl1" -d "libxkbcommon0" \
             -m "AneekHait" \
             --description "TicketAudit ITSM Ticket Data Analysis and Audit Application" \
-            -p dist/ticketaudit_1.0.0_amd64.deb
+            -p dist/ticketaudit_2.2.1_amd64.deb
 
       - name: Build .rpm Package
         run: |
           fpm -s dir -t rpm \
             -n ticketaudit \
-            -v 1.0.0 \
+            -v 2.2.1 \
             --architecture x86_64 \
             -C pkg \
             --prefix / \
             -m "AneekHait" \
             --description "TicketAudit ITSM Ticket Data Analysis and Audit Application" \
-            -p dist/ticketaudit-1.0.0-1.x86_64.rpm
+            -p dist/ticketaudit-2.2.1-1.x86_64.rpm
 
       - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: TicketAudit-Linux
           path: |
-            dist/ticketaudit_1.0.0_amd64.deb
-            dist/ticketaudit-1.0.0-1.x86_64.rpm
+            dist/ticketaudit_2.2.1_amd64.deb
+            dist/ticketaudit-2.2.1-1.x86_64.rpm
           if-no-files-found: error
 
   # ---------------------------------------------------------------------------
